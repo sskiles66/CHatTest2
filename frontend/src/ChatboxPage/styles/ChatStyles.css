@@ -1,0 +1,61 @@
+#chat-cont {
+    background-color: blue;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    width: 100%;
+    height: 100vh;
+}
+
+#chat-options {
+    background-color: aliceblue;
+    grid-row: 1/4;
+    grid-column: 1/2;
+    margin: 5px;
+}
+
+.chat-option {
+    background-color: aqua;
+}
+
+#message-log {
+    background-color: aliceblue;
+    grid-row: 1/3;
+    grid-column: 2/4;
+    margin: 5px;
+
+    overflow: auto;
+}
+
+#message-sender {
+    background-color: aliceblue;
+    grid-row: 3/4;
+    grid-column: 2/4;
+    margin: 5px;
+}
+
+
+#active {
+    background-color: yellowgreen;
+}
+
+.sender {
+    text-align: right;
+    
+}
+
+#sender {
+    background-color: aqua;
+    display: inline-block;
+    margin: 10px;
+    padding: 10px;
+    text-align: left;
+}
+
+
+#receiver {
+    background-color: yellowgreen;
+    display: inline-block;
+    margin: 10px;
+    padding: 10px;
+}
