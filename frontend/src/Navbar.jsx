@@ -25,9 +25,16 @@ export default function Navbar(){
             fetchUnseenMessages();
         }
         
-        
-    }, [id, notifications]);
+        // had notifications in dependency array but I believe this was making everything re-render maybe?
+    }, [id]);
 
+
+    // useEffect(() => {
+    //     setNotifications(notifications);
+    // }, [notifications])
+
+
+console.log(notifications, "notititit")
     return (
         <>
             <p>Navbar</p>

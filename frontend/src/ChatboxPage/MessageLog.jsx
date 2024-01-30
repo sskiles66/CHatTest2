@@ -15,9 +15,10 @@ export default function MessageLog() {
     sellerInOption,
     processingNewMessages,
     setProcessingNewMessages,
+    
   } = useContext(ChatboxContext);
 
-  const { username, id } = useContext(UserContext);
+  const { username, id, setNotifications} = useContext(UserContext);
 
   const [loading, setLoading] = useState(true);
 
@@ -91,6 +92,11 @@ export default function MessageLog() {
           }
         }
       });
+      // setNotifications(
+      //     messages.filter(
+      //       (message) => message.sender == id && message.seen == false && message.chatOption == chatOption
+      //     )
+      //   );
       console.log(promises);
     }
    

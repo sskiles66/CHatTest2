@@ -6,7 +6,7 @@ import { ChatboxContext } from "./ChatboxContext";
 export default function ChatOptions() {
   const { username, id, notifications} = useContext(UserContext);
 
-  const [chatOptions, setChatOptions] = useState();
+  
 
   const {
     setChatOption,
@@ -16,6 +16,8 @@ export default function ChatOptions() {
     setMessages,
     processingNewMessages,
     setProcessingNewMessages,
+    chatOptions,
+    setChatOptions
 
   } = useContext(ChatboxContext);
 

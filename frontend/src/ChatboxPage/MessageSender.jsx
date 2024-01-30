@@ -17,6 +17,7 @@ export default function MessageSender() {
     chatOption,
     buyerInOption,
     sellerInOption,
+    messages,
     setMessages,
     chatOptions,
     setChatOptions,
@@ -70,12 +71,12 @@ export default function MessageSender() {
       },
     ]);
 
-    setNotifications(
-      prev,
-      messages.filter(
-        (message) => message.sender == id && message.seen == false
-      )
-    );
+    //This wasn't running since the effect hook that refetches data in Navbar isn't being rerun.
+    // setNotifications(
+    //   messages.filter(
+    //     (message) => message.sender == id && message.seen == false
+    //   )
+    // );
   }
 
   //   const handleMessage = debounce((e) => {

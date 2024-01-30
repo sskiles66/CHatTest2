@@ -6,6 +6,8 @@ export const ChatboxContext = createContext({});
 export function ChatboxContextProvider({ children }) {
   const [chatOption, setChatOption] = useState(null);
 
+  const [chatOptions, setChatOptions] = useState();
+
   const [buyerInOption, setBuyerInOption] = useState(null);
 
   const [sellerInOption, setSellerInOption] = useState(null);
@@ -30,7 +32,8 @@ export function ChatboxContextProvider({ children }) {
         setMessages,
         processingNewMessages,
         setProcessingNewMessages,
-
+        chatOptions,
+        setChatOptions
       }}
     >
       {children}
