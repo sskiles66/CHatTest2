@@ -7,6 +7,7 @@ export function UserContextProvider({ children }) {
   const [username, setLoggedInUsername] = useState(null);
   const [id, setId] = useState(null);
   const [notifications, setNotifications] = useState([]);
+  const [changeTest, setChangeTest] = useState("");
   useEffect(() => {
     axios.get("/profile").then((response) => {
       setId(response.data.userId);
@@ -22,6 +23,8 @@ export function UserContextProvider({ children }) {
         setId,
         notifications,
         setNotifications,
+        changeTest,
+        setChangeTest
       }}
     >
       {children}

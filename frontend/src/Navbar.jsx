@@ -1,11 +1,13 @@
 import { useEffect, useState, useContext } from "react"
 import { UserContext } from "./UserContext";
+import { ChatboxContext } from "./ChatboxPage/ChatboxContext";
 
 export default function Navbar(){
 
     
 
-    const {username, id, notifications, setNotifications} = useContext(UserContext);
+    const {username, id, notifications, setNotifications, changeTest, setChangeTest} = useContext(UserContext);
+    const {messages} = useContext(ChatboxContext);
 
     useEffect(() => {
         const fetchUnseenMessages = async () => {
@@ -23,10 +25,11 @@ export default function Navbar(){
 
         if (id){
             fetchUnseenMessages();
+            setChangeTest("");
         }
         
         // had notifications in dependency array but I believe this was making everything re-render maybe?
-    }, [id]);
+    }, [id, changeTest, messages]);
 
 
     // useEffect(() => {

@@ -72,76 +72,78 @@ export default function MessageSender() {
     ]);
 
     //This wasn't running since the effect hook that refetches data in Navbar isn't being rerun.
-    // setNotifications(
-    //   messages.filter(
-    //     (message) => message.sender == id && message.seen == false
-    //   )
-    // );
+    
+
+    if (messages){
+      console.log(messages, "messages!!!");
+      setNotifications((prev) => 
+      prev,
+      messages.filter(
+        (message) => message.receiver == id && message.seen == false
+      )
+    );
+    }
+
+    // setNotifications(messageData);
+    
   }
 
-  //   const handleMessage = debounce((e) => {
-  //     const messageData = JSON.parse(e.data);
-  //     console.log(messageData, "messageData");
-  //     // Miss isOur false for now 2:49
-  //     setMessages((prev) => [...prev, { chatOption: messageData.chatOption, buyer: messageData.buyer, seller: messageData.seller, sender: messageData.sender, senderType: messageData.senderType, receiver: messageData.receiver, receiverType: messageData.receiverType, text: messageData.text }]);
-  //   }, 250);
 
-  //   window.addEventListener('resize', handleMessage);
 
   function sendMessage(e) {
     e.preventDefault();
 
-    // if (broadcast) {
-    //   chatOptions.forEach((element) => {
-    //     fetch("http://localhost:4040/chat/message", {
-    //       method: "POST",
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //       },
-    //       body: JSON.stringify({
-    //         subscription_id: element._id,
-    //         buyer: element.buyer_id,
-    //         seller: element.seller_id,
-    //         sender: realSender,
-    //         senderType: realSenderType,
-    //         receiver: realReceiver,
-    //         receiverType: realReceiverType,
-    //         text: messageText,
-    //         date_now_exclusion: Date.now(),
-    //         seen: false,
-    //       }),
-    //     })
-    //       .then((response) => response.json())
-    //       .then((data) => {
-    //         console.log("Success:", data);
-    //         // setMessages((prev) => [...prev, { text: messageText, subscription_id: chatOption, sender: realSender, senderType: realSenderType, receiver: realReceiver, receiverType: realReceiverType, date: Date.now() }]);
-    //       })
-    //       .catch((error) => {
-    //         errorMessages.push(error);
-    //         console.error("Error:", error);
-    //       });
+    if (broadcast) {
+      chatOptions.forEach((element) => {
+        fetch("http://localhost:4040/chat/message", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            subscription_id: element._id,
+            buyer: element.buyer_id,
+            seller: element.seller_id,
+            sender: realSender,
+            senderType: realSenderType,
+            receiver: realReceiver,
+            receiverType: realReceiverType,
+            text: messageText,
+            date_now_exclusion: Date.now(),
+            seen: false,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Success:", data);
+            // setMessages((prev) => [...prev, { text: messageText, subscription_id: chatOption, sender: realSender, senderType: realSenderType, receiver: realReceiver, receiverType: realReceiverType, date: Date.now() }]);
+          })
+          .catch((error) => {
+            errorMessages.push(error);
+            console.error("Error:", error);
+          });
 
-    //     try {
-    //       ws.send(
-    //         JSON.stringify({
-    //           chatOption: element._id,
-    //           buyer: element.buyer_id,
-    //           seller: element.seller_id,
-    //           sender: realSender,
-    //           senderType: realSenderType,
-    //           receiver: realReceiver,
-    //           receiverType: realReceiverType,
-    //           text: messageText,
-    //           date_now_exclusion: Date.now(),
-    //           seen: false,
-    //         })
-    //       );
-    //     } catch (error) {
-    //       errorMessages.push(error);
-    //       console.error("Error:", error);
-    //     }
-    //   });
-    // } else {
+        try {
+          ws.send(
+            JSON.stringify({
+              chatOption: element._id,
+              buyer: element.buyer_id,
+              seller: element.seller_id,
+              sender: realSender,
+              senderType: realSenderType,
+              receiver: realReceiver,
+              receiverType: realReceiverType,
+              text: messageText,
+              date_now_exclusion: Date.now(),
+              seen: false,
+            })
+          );
+        } catch (error) {
+          errorMessages.push(error);
+          console.error("Error:", error);
+        }
+      });
+    } else {
       fetch("http://localhost:4040/chat/message", {
         method: "POST",
         headers: {
@@ -189,7 +191,7 @@ export default function MessageSender() {
         errorMessages.push(error);
         console.error("Error:", error);
       }
-    // }
+    }
 
     setMessageText("");
     

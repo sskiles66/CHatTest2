@@ -18,7 +18,7 @@ export default function MessageLog() {
     
   } = useContext(ChatboxContext);
 
-  const { username, id, setNotifications} = useContext(UserContext);
+  const { username, id, setNotifications, setChangeTest} = useContext(UserContext);
 
   const [loading, setLoading] = useState(true);
 
@@ -92,6 +92,8 @@ export default function MessageLog() {
           }
         }
       });
+      //make new fetch to notifications. Possible solution. Update messages to seen and then refetch notifications.
+      setChangeTest("test");
       // setNotifications(
       //     messages.filter(
       //       (message) => message.sender == id && message.seen == false && message.chatOption == chatOption
