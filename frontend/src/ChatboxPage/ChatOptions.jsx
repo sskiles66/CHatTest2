@@ -4,9 +4,7 @@ import Option from "./Option";
 import { ChatboxContext } from "./ChatboxContext";
 
 export default function ChatOptions() {
-  const { username, id, notifications} = useContext(UserContext);
-
-  
+  const { id, notifications} = useContext(UserContext);
 
   const {
     setChatOption,
@@ -20,6 +18,8 @@ export default function ChatOptions() {
     setChatOptions
 
   } = useContext(ChatboxContext);
+
+  // OnMount, chatOptions are fetched and then set.
 
   useEffect(() => {
     const fetchOptions = async () => {
@@ -40,9 +40,11 @@ export default function ChatOptions() {
     
   }, []);
 
-  console.log(chatOptions, "chatOptions");
+  // console.log(chatOptions, "chatOptions");
 
-  
+  // Map through each option to make them components with props as data.
+  // Notifications are set in the navbar component and are filtered based upon the sub_id.
+  // When an option is clicked, some data is set in the chatbox context.
 
   return (
     <>

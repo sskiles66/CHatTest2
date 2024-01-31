@@ -56,6 +56,7 @@ mongoose
 
     const wss = new ws.WebSocketServer({ server });
     wss.on("connection", (connection, req) => {
+
       // read username and id form the cookie for this connection
       const cookies = req.headers.cookie;
       if (cookies) {
@@ -77,6 +78,7 @@ mongoose
 
       console.log("connected");
 
+      // This code runs when a message has been sent from the client.
       connection.on("message", (message) => {
         const messageData = JSON.parse(message.toString());
 
@@ -110,27 +112,31 @@ mongoose
             }
           }
 
-          if (receiverFound) {
-            // Receiver is available
-            availableAndSpecifiedClients.forEach((client) =>
-            client.send(
-              JSON.stringify({
-                chatOption,
-                buyer,
-                seller,
-                sender,
-                senderType,
-                receiver,
-                receiverType,
-                text,
-                date_now_exclusion,
-                seen: true
+          // Need to do testing here.
+          // It is expectedly true or false when someone is not connected but just because they are connected 
+          // doesn't mean that they have seen the message since they are different chat logs (options)
+          console.log(receiverFound);
+          // if (receiverFound) {
+          //   // Receiver is available
+          //   availableAndSpecifiedClients.forEach((client) =>
+          //   client.send(
+          //     JSON.stringify({
+          //       chatOption,
+          //       buyer,
+          //       seller,
+          //       sender,
+          //       senderType,
+          //       receiver,
+          //       receiverType,
+          //       text,
+          //       date_now_exclusion,
+          //       seen: true
 
-              })
-            )
-          );
+          //     })
+          //   )
+          // );
             
-          } else {
+          // } else {
             // Receiver is not available
             availableAndSpecifiedClients.forEach((client) =>
             client.send(
@@ -149,7 +155,7 @@ mongoose
               })
             )
           );
-          }
+          // }
 
           // Testing purposes
           [...wss.clients]

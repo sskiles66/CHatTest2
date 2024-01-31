@@ -26,7 +26,15 @@ const addMessage = async (req, res) => {
 
 const getMessagesForSubscription = async (req, res) => {
     try {
-        const messages = await MessageModel.find({subscription_id: req.params.sub_id});
+        // const messages = await MessageModel.find({subscription_id: req.params.sub_id})
+        const messages = await MessageModel.find({
+            subscription_id: req.params.sub_id,
+            $or: [{ buyer: req.params.id }, { seller: req.params.id }],
+          })
+        // This is just to get the 10 most recent messages.
+        .sort({createdAt: -1})
+        .limit(10);
+        messages.reverse();
         if(messages){
             res.status(200).json(messages)
         }

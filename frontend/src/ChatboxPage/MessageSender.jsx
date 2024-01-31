@@ -31,6 +31,8 @@ export default function MessageSender() {
   let realReceiver;
   let realReceiverType;
 
+  // Clarifications for data output on who is who
+
   if (id == buyerInOption) {
     realSender = buyerInOption;
     realSenderType = "Buyer";
@@ -45,12 +47,18 @@ export default function MessageSender() {
     realReceiverType = "Buyer";
   }
 
+  // On mount, the ws is set-up and it listens for messages from the server.
+
   useEffect(() => {
     const ws = new WebSocket("ws://localhost:4040");
     setWs(ws);
     ws.addEventListener("message", handleMessage);
   }, []);
 
+
+  // This is the function that is called when a message is sent from the server to the client.
+  // It sets messages to build upon the previous messages that have already been fetched from the db.
+  // Have ran into issues with rerendering notification here.
   function handleMessage(e) {
     const messageData = JSON.parse(e.data);
     console.log(messageData, "messageData");
@@ -74,26 +82,32 @@ export default function MessageSender() {
     //This wasn't running since the effect hook that refetches data in Navbar isn't being rerun.
     
 
-    if (messages){
-      console.log(messages, "messages!!!");
-      setNotifications((prev) => 
-      prev,
-      messages.filter(
-        (message) => message.receiver == id && message.seen == false
-      )
-    );
-    }
+    // if (messages){
+    //   console.log(messages, "messages!!!");
+    //   setNotifications((prev) => 
+    //   prev,
+    //   messages.filter(
+    //     (message) => message.receiver == id && message.seen == false
+    //   )
+    // );
+    // }
 
     // setNotifications(messageData);
     
   }
 
 
-
+  // This function currently references a broadcast state so that if it is true,
+  // it sends the messages to all of the user's chatOptions
   function sendMessage(e) {
     e.preventDefault();
-
+    //Currently a bug with broadcasting
     if (broadcast) {
+
+      //There is a problem with this because of my set-up. I currently can't have more than two subscribers
+      // to the same subscription and this would require me to build things up again so I am trusting
+      // that during the implementation process there is a way to do this.
+      // There are already issues that exist with this as well with updating messages and whatnot.
       chatOptions.forEach((element) => {
         fetch("http://localhost:4040/chat/message", {
           method: "POST",
@@ -144,6 +158,8 @@ export default function MessageSender() {
         }
       });
     } else {
+
+      //Post new message to db.
       fetch("http://localhost:4040/chat/message", {
         method: "POST",
         headers: {
@@ -172,6 +188,7 @@ export default function MessageSender() {
           console.error("Error:", error);
         });
 
+      // Ws sending message to server
       try {
         ws.send(
           JSON.stringify({

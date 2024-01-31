@@ -10,6 +10,10 @@ import { BrowserRouter, Routes, Route} from 'react-router-dom'
 import Chatbox from './ChatboxPage/Chatbox'
 import Navbar from "./Navbar";
 
+// Just seperates the application into two parts with userContext containing
+// everything and having the landingpage and the chatbox as seperate pages
+// Navbar is a global component
+
 function App() {
   
   axios.defaults.baseURL = "http://localhost:4040";

@@ -14,6 +14,8 @@ export default function Message(props) {
 
     let clarification;
 
+    // Based upon the props, render specific data on who sent and received a message with text.
+
     if (id == props.messageData.sender) {
         role = "sender";
         if (id == buyerInOption){

@@ -4,7 +4,11 @@ const router = require("express").Router();
 
 router.post("/message", addMessage);
 
-router.get("/message/:sub_id", getMessagesForSubscription);
+// router.get("/message/:sub_id", getMessagesForSubscription);
+
+// For some reason, have to have spec to seperate params, otherwise, whole thing breaks
+router.get("/message/:sub_id/spec/:id", getMessagesForSubscription);
+
 
 router.delete("/message", deleteAllMessages);
 

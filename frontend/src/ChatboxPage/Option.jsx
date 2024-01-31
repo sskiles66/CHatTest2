@@ -6,6 +6,9 @@ import { ChatboxContext } from "./ChatboxContext";
 export default function Option(props) {
     
 
+    // Each option has different data attacted to it (from the props) 
+    // like who the seller is, who the buyer is, the subscription name
+    // and how many notifications there are.
     const {chatOption} = useContext(ChatboxContext);
 
     console.log(props, "props");

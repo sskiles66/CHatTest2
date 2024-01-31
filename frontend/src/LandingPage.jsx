@@ -3,6 +3,8 @@ import { useContext } from "react";
 import { UserContext } from "./UserContext";
 import { Link } from 'react-router-dom'
 
+// Register and Login components for buyers and sellers. When logged in, they can access the chatbox.
+
 
 export default function LandingPage() {
     const {username, id} = useContext(UserContext);

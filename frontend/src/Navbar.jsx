@@ -6,8 +6,11 @@ export default function Navbar(){
 
     
 
-    const {username, id, notifications, setNotifications, changeTest, setChangeTest} = useContext(UserContext);
+    const {id, notifications, setNotifications, rerender, setRerender} = useContext(UserContext);
     const {messages} = useContext(ChatboxContext);
+
+    // When id exists, fetch unseen messages from db. Recalls when rerender changes.
+    // Having notifications in dependancy array make it so everything rerenders constantly.
 
     useEffect(() => {
         const fetchUnseenMessages = async () => {
@@ -25,11 +28,11 @@ export default function Navbar(){
 
         if (id){
             fetchUnseenMessages();
-            setChangeTest("");
+            setRerender("");
         }
         
         // had notifications in dependency array but I believe this was making everything re-render maybe?
-    }, [id, changeTest]);
+    }, [id, rerender]);
 
 
     // useEffect(() => {
@@ -37,11 +40,12 @@ export default function Navbar(){
     // }, [notifications])
 
 
-console.log(notifications, "notititit")
+    // console.log(notifications, "notititit")
     return (
         <>
             <p>Navbar</p>
             {notifications ? (<p>{notifications.length}</p>) : 0}
+            <button onClick={() => setRerender("render")}>Refresh</button>
             
         </>
     )
