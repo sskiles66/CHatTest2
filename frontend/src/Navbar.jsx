@@ -29,7 +29,7 @@ export default function Navbar(){
         }
         
         // had notifications in dependency array but I believe this was making everything re-render maybe?
-    }, [id, changeTest, messages]);
+    }, [id, changeTest]);
 
 
     // useEffect(() => {
