@@ -1,6 +1,13 @@
-const {addMessage, getMessagesForSubscription, deleteAllMessages, updateMessage, getUnseenMessagesForUser} = require("../controllers/MessageController");
+const {
+  addMessage,
+  getMessagesForSubscription,
+  deleteAllMessages,
+  updateMessageSeen,
+  getUnseenMessagesForUser,
+  updateMessageText,
+  deleteMessage
+} = require("../controllers/MessageController");
 const router = require("express").Router();
-
 
 router.post("/message", addMessage);
 
@@ -9,12 +16,14 @@ router.post("/message", addMessage);
 // For some reason, have to have spec to seperate params, otherwise, whole thing breaks
 router.get("/message/:sub_id/spec/:id", getMessagesForSubscription);
 
-
 router.delete("/message", deleteAllMessages);
 
-router.patch("/message/:id", updateMessage);
+router.delete("/message/delete/:id", deleteMessage);
+
+router.patch("/message/:id", updateMessageSeen);
+
+router.patch("/message/edit/:id", updateMessageText);
 
 router.get("/message/notif/:user_id", getUnseenMessagesForUser);
-
 
 module.exports = router;

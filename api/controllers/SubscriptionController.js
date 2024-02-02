@@ -19,7 +19,9 @@ const getSubscriptionsForUser = async (req, res) => {
     try {
         const subscriptions = await SubscriptionModel.find({
             $or: [{ buyer_id: req.params.id }, { seller_id: req.params.id }]
-          }).sort({ updatedAt: -1 }); // Sort by updatedAt in descending order
+          })
+          .sort({ updatedAt: -1 })
+          .lean(); // Sort by updatedAt in descending order
           
         if(subscriptions){
             res.status(200).json(subscriptions)

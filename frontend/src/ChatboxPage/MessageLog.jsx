@@ -147,7 +147,7 @@ export default function MessageLog() {
           ) : (
             <>
               {filteredMessages.map((message, index) => (
-                <Message key={index} messageData={message} />
+                <Message key={index} messageData={message} isLast={index === filteredMessages.length - 1}/>
               ))}
               <div ref={divUnderMessages}></div>
             </>

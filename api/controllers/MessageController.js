@@ -33,7 +33,8 @@ const getMessagesForSubscription = async (req, res) => {
           })
         // This is just to get the 10 most recent messages.
         .sort({createdAt: -1})
-        .limit(10);
+        .limit(10)
+        .lean();
         messages.reverse();
         if(messages){
             res.status(200).json(messages)
@@ -54,7 +55,7 @@ const deleteAllMessages = async (req, res) => {
     }
 }
 
-const updateMessage = async (req, res) => {
+const updateMessageSeen = async (req, res) => {
     try {
         const {subscription_id, buyer, seller, sender, senderType, receiver, receiverType, text, date_now_exclusion, seen} = req.body;
         const updatedMessage = await MessageModel.findOneAndUpdate({_id: req.params.id }, {
@@ -68,9 +69,23 @@ const updateMessage = async (req, res) => {
     }
 }
 
+const updateMessageText = async (req, res) => {
+    try {
+        const {subscription_id, buyer, seller, sender, senderType, receiver, receiverType, text, date_now_exclusion, seen} = req.body;
+        const updatedMessage = await MessageModel.findOneAndUpdate({_id: req.params.id }, {
+            $set: {
+              text: text
+            },
+          } );
+          res.status(200).json(updatedMessage)
+    } catch (err) {
+        if (err) throw err;
+    }
+}
+
 const getUnseenMessagesForUser = async (req, res) => {
     try {
-        const messages = await MessageModel.find({receiver: req.params.user_id, seen: false});
+        const messages = await MessageModel.find({receiver: req.params.user_id, seen: false}).lean();
         // console.log(messages);
         if (messages) {
             res.status(200).json(messages)
@@ -81,12 +96,26 @@ const getUnseenMessagesForUser = async (req, res) => {
     }
 }
 
+const deleteMessage = async (req, res) => {
+    const { id } = req.params;     //Params gets whatever id that is in the search bar
+
+    const message = await MessageModel.findOneAndDelete({_id: id});  //Mongo id: our param id
+
+    if (!message){
+        return res.status(400).json({error: "Item does not exist"});
+    }
+
+    res.status(200).json(message);
+}
+
 
 
 module.exports = {
     addMessage,
     getMessagesForSubscription,
     deleteAllMessages,
-    updateMessage,
-    getUnseenMessagesForUser
+    updateMessageSeen,
+    getUnseenMessagesForUser,
+    updateMessageText,
+    deleteMessage
 }
