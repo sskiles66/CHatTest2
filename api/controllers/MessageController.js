@@ -34,6 +34,7 @@ const getLimitedMessagesForSubscription = async (req, res) => {
         // This is just to get the 10 most recent messages.
         .sort({createdAt: -1})
         .limit(10)
+        .lean()
         
         messages.reverse();
         if(messages){
@@ -51,6 +52,7 @@ const getAllMessagesForSubscription = async (req, res) => {
             subscription_id: req.params.sub_id,
             $or: [{ buyer: req.params.id }, { seller: req.params.id }],
           })
+          .lean()
         
         if(messages){
             res.status(200).json(messages)
