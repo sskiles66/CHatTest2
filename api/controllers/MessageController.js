@@ -24,7 +24,7 @@ const addMessage = async (req, res) => {
     }
 }
 
-const getMessagesForSubscription = async (req, res) => {
+const getLimitedMessagesForSubscription = async (req, res) => {
     try {
         // const messages = await MessageModel.find({subscription_id: req.params.sub_id})
         const messages = await MessageModel.find({
@@ -34,8 +34,24 @@ const getMessagesForSubscription = async (req, res) => {
         // This is just to get the 10 most recent messages.
         .sort({createdAt: -1})
         .limit(10)
-        .lean();
+        
         messages.reverse();
+        if(messages){
+            res.status(200).json(messages)
+        }
+    } catch (err) {
+        if (err) throw err;
+    }
+}
+
+const getAllMessagesForSubscription = async (req, res) => {
+    try {
+        // const messages = await MessageModel.find({subscription_id: req.params.sub_id})
+        const messages = await MessageModel.find({
+            subscription_id: req.params.sub_id,
+            $or: [{ buyer: req.params.id }, { seller: req.params.id }],
+          })
+        
         if(messages){
             res.status(200).json(messages)
         }
@@ -112,10 +128,11 @@ const deleteMessage = async (req, res) => {
 
 module.exports = {
     addMessage,
-    getMessagesForSubscription,
+    getLimitedMessagesForSubscription,
     deleteAllMessages,
     updateMessageSeen,
     getUnseenMessagesForUser,
     updateMessageText,
-    deleteMessage
+    deleteMessage,
+    getAllMessagesForSubscription
 }

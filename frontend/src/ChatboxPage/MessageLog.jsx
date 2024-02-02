@@ -23,6 +23,8 @@ export default function MessageLog() {
   // To make sure that the rendering of this component waits until the messages are ready.
   const [loading, setLoading] = useState(true);
 
+  const [allMessagesFetched, setAllMessagesFetched] = useState(false);
+
   // This is for autoscrolling
   const divUnderMessages = useRef();
 
@@ -38,7 +40,7 @@ export default function MessageLog() {
       const response = await fetch(
         // Had to add id so there is extra filtering happening when fetching messages
         // for when we have multiple people subscribed to the same item
-        `http://localhost:4040/chat/message/${chatOption}/spec/${id}`
+        `http://localhost:4040/chat/message/${chatOption}/all/${id}`
       );
       
       console.log(response, "resposne");
@@ -123,6 +125,49 @@ export default function MessageLog() {
 
   // console.log(messages, "messages");
 
+  // useEffect(() => {
+  //   const fetchAllMessages = async () => {
+  //     // console.log(id);
+  //     const response = await fetch(
+  //       // Had to add id so there is extra filtering happening when fetching messages
+  //       // for when we have multiple people subscribed to the same item
+  //       `http://localhost:4040/chat/message/${chatOption}/all/${id}`
+  //     );
+      
+  //     console.log(response, "resposne");
+  //     const json = await response.json();
+
+  //     if (response.ok) {
+  //       setMessages([]);
+  //       setMessages((prev) => {
+  //         const newMessages = json.map((message) => ({
+  //           _id: message._id,
+  //           chatOption: message.subscription_id,
+  //           buyer: buyerInOption,
+  //           seller: sellerInOption,
+  //           sender: message.sender,
+  //           senderType: message.senderType,
+  //           receiver: message.receiver,
+  //           receiverType: message.receiverType,
+  //           text: message.text,
+  //           date_now_exclusion: message.date_now_exclusion,
+  //           seen: message.seen
+  //         }));
+  //         return [...prev,...newMessages];
+  //       });
+  //       console.log(json, "jsonnnnnrewestuff");
+  //       // setLoading(false);
+  //       // setProcessingNewMessages(true);
+  //     }
+  //   };
+
+  //   if (allMessagesFetched) {
+  //     fetchAllMessages();
+  //     setAllMessagesFetched(false);
+  //     console.log(messages,"new messages stuff");
+  //   }
+  // }, [allMessagesFetched]);
+
   // Currently necessary for messages coming through the websocket because thats where duplication
   // is taking place. Gave each document an exlusion date so that this next code wouldn't break the fetch.
 
@@ -130,15 +175,18 @@ export default function MessageLog() {
   // gets rid of the duplicates based upon the date that they were created. 
   const uniqueMessages = uniqBy(messages, "date_now_exclusion");
 
-  // console.log(uniqueMessages, " unique messages");
+  console.log(uniqueMessages, " unique messages");
 
   // Filtering messages by chatOption so you see messages only for that chatOption or log.
   const filteredMessages = uniqueMessages.filter(
     (message) => message.chatOption === chatOption
   );
 
+  console.log(filteredMessages, " filtered messages");
+
   return (
     <>
+    {!allMessagesFetched ? <button onClick={() => setAllMessagesFetched(true)}>Fetch all messages</button> : ""}
       <h1>Message Log</h1>
       {chatOption ? (
         <>

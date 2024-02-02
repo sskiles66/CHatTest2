@@ -14,7 +14,7 @@ export default function Message(props) {
 
   const [isDeleted, setIsDeleted] = useState(false);
 
-  console.log(props, "message props");
+//   console.log(props, "message props");
 
   let role;
 
@@ -59,7 +59,7 @@ export default function Message(props) {
     // Format the output
     const formattedDate = `${month}/${day} ${hours}:${minutes}`;
 
-    console.log(formattedDate); // Output: 2/1 16:47:43
+    // console.log(formattedDate); // Output: 2/1 16:47:43
 
     return formattedDate
   }
@@ -68,7 +68,7 @@ export default function Message(props) {
 
   function editMessage(e) {
     e.preventDefault();
-    console.log(messageText);
+    // console.log(messageText);
     fetch(`http://localhost:4040/chat/message/edit/${props.messageData._id}`, {
       method: "PATCH",
       headers: {
@@ -83,7 +83,7 @@ export default function Message(props) {
 
   function deleteMessage(e) {
     e.preventDefault();
-    console.log(props.messageData._id, "_ididid");
+    // console.log(props.messageData._id, "_ididid");
 
     fetch(
       `http://localhost:4040/chat/message/delete/${props.messageData._id}`,
@@ -92,7 +92,7 @@ export default function Message(props) {
       }
     )
       .then((response) => {
-        console.log(response);
+        // console.log(response);
       })
       .catch((error) => {
         console.log(error);

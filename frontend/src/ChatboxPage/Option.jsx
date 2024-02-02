@@ -11,7 +11,7 @@ export default function Option(props) {
     // and how many notifications there are.
     const {chatOption} = useContext(ChatboxContext);
 
-    console.log(props, "props");
+    // console.log(props, "props");
 
     const {username, id} = useContext(UserContext);
 
