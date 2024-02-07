@@ -8,6 +8,8 @@ import { UserContext } from "../UserContext";
 
 import { ChatboxContextProvider } from "./ChatboxContext";
 
+import Container from "./Container";
+
 import "./styles/ChatStyles.css";
 
 // Chatbox container for main components. There is also a chatbox context for specific data in the chatbox.
@@ -25,17 +27,7 @@ export default function Chatbox() {
         <>
 
             <ChatboxContextProvider>
-            {username ? <div id="chat-cont">
-                <div id="chat-options">
-                    <ChatOptions />
-                </div>
-                <div id="message-log">
-                    <MessageLog />
-                </div>
-                <div id="message-sender">
-                    <MessageSender />
-                </div>
-            </div> : <p>Please login</p>}
+            <Container />
             </ChatboxContextProvider>
             
         </>

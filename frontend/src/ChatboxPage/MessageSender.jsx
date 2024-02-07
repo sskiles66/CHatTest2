@@ -3,15 +3,10 @@ import { UserContext } from "../UserContext";
 import { ChatboxContext } from "./ChatboxContext";
 import { v4 as uuidv4 } from "uuid";
 import debounce from "lodash/debounce";
+import { io } from "socket.io-client";
 
 export default function MessageSender() {
   const { username, id, setNotifications } = useContext(UserContext);
-
-  const [messageText, setMessageText] = useState("");
-
-  const [ws, setWs] = useState(null);
-
-  const [broadcast, setBroadcast] = useState(false);
 
   const {
     chatOption,
@@ -22,6 +17,54 @@ export default function MessageSender() {
     chatOptions,
     setChatOptions,
   } = useContext(ChatboxContext);
+
+  const [messageText, setMessageText] = useState("");
+
+  const [ws, setWs] = useState(null);
+
+  const [broadcast, setBroadcast] = useState(false);
+  const socket = io("http://localhost:3000");
+  socket.on("connect", () => {
+    console.log("connected");
+  });
+
+  //The join method is not directly available 
+  // on the socket object in socket.io-client. 
+  // Instead, you need to emit a custom event to the server requesting to join a room.
+
+  // Emit an event requesting to join the room
+  socket.emit("join-room", chatOption);
+
+  // Listen for confirmation from the server
+  socket.on("join-room-confirmation", (data) => {
+    if (data.success) {
+      // Successfully joined the room
+      console.log("Joined room:", chatOption);
+    } else {
+      // handle error message (e.g., invalid chatOption)
+    }
+  });
+
+  socket.on("handle-message", (message) => {
+    console.log(message, "INCOMING");
+    const newMessage = JSON.parse(message);
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        chatOption: newMessage.subscription_id,
+        buyer: newMessage.buyer,
+        seller: newMessage.seller,
+        sender: newMessage.sender,
+        senderType: newMessage.senderType,
+        receiver: newMessage.receiver,
+        receiverType: newMessage.receiverType,
+        text: newMessage.text,
+        date_now_exclusion: newMessage.date_now_exclusion,
+        seen: newMessage.seen,
+      },
+    ]);
+  });
 
   let errorMessages = [];
 
@@ -117,46 +160,64 @@ export default function MessageSender() {
           seen: false,
         }),
       });
-  
+
       if (postResponse.ok) {
         const postData = await postResponse.json();
         console.log("Success:", postData);
       } else {
         throw new Error("Error posting message");
       }
-  
-      // Fetch messages after successful POST (second request)
-      const getResponse = await fetch(
-        `http://localhost:4040/chat/message/${chatOption}/all/${id}`
+
+      socket.emit(
+        "send-message",
+        JSON.stringify({
+          // ... message data
+          subscription_id: chatOption,
+          buyer: buyerInOption,
+          seller: sellerInOption,
+          sender: realSender,
+          senderType: realSenderType,
+          receiver: realReceiver,
+          receiverType: realReceiverType,
+          text: messageText,
+          date_now_exclusion: Date.now(),
+          seen: false,
+        }),
+        chatOption
       );
-  
-      if (getResponse.ok) {
-        const json = await getResponse.json();
-        console.log(json, "jsonnnn");
-        setMessages((prev) => {
-          const newMessages = json.map((message) => ({
-            _id: message._id,
-            chatOption: message.subscription_id,
-            buyer: buyerInOption,
-            seller: sellerInOption,
-            sender: message.sender,
-            senderType: message.senderType,
-            receiver: message.receiver,
-            receiverType: message.receiverType,
-            text: message.text,
-            date_now_exclusion: message.date_now_exclusion,
-            seen: message.seen
-          }));
-          return [...prev, ...newMessages];
-        });
-      } else {
-        throw new Error("Error fetching messages");
-      }
+
+      // // Fetch messages after successful POST (second request)
+      // const getResponse = await fetch(
+      //   `http://localhost:4040/chat/message/${chatOption}/all/${id}`
+      // );
+
+      // if (getResponse.ok) {
+      //   const json = await getResponse.json();
+      //   console.log(json, "jsonnnn");
+      //   setMessages((prev) => {
+      //     const newMessages = json.map((message) => ({
+      //       _id: message._id,
+      //       chatOption: message.subscription_id,
+      //       buyer: buyerInOption,
+      //       seller: sellerInOption,
+      //       sender: message.sender,
+      //       senderType: message.senderType,
+      //       receiver: message.receiver,
+      //       receiverType: message.receiverType,
+      //       text: message.text,
+      //       date_now_exclusion: message.date_now_exclusion,
+      //       seen: message.seen
+      //     }));
+      //     return [...prev, ...newMessages];
+      //   });
+      // } else {
+      //   throw new Error("Error fetching messages");
+      // }
     } catch (error) {
       errorMessages.push(error);
       console.error("Error:", error);
     }
-  
+
     setMessageText("");
   }
 
@@ -250,37 +311,36 @@ export default function MessageSender() {
           console.error("Error:", error);
         });
 
+      const response = await fetch(
+        // Had to add id so there is extra filtering happening when fetching messages
+        // for when we have multiple people subscribed to the same item
+        `http://localhost:4040/chat/message/${chatOption}/all/${id}`
+      );
 
-        const response = await fetch(
-          // Had to add id so there is extra filtering happening when fetching messages
-          // for when we have multiple people subscribed to the same item
-          `http://localhost:4040/chat/message/${chatOption}/all/${id}`
-        );
-        
-        console.log(response, "resposne");
-        const json = await response.json();
-  
-        if (response.ok) {
-          setMessages((prev) => {
-            const newMessages = json.map((message) => ({
-              _id: message._id,
-              chatOption: message.subscription_id,
-              buyer: buyerInOption,
-              seller: sellerInOption,
-              sender: message.sender,
-              senderType: message.senderType,
-              receiver: message.receiver,
-              receiverType: message.receiverType,
-              text: message.text,
-              date_now_exclusion: message.date_now_exclusion,
-              seen: message.seen
-            }));
-            return [...prev, ...newMessages];
-          });
-          console.log(json, "jsonnnn");
-          // setLoading(false);
-          // setProcessingNewMessages(true);
-        }
+      console.log(response, "resposne");
+      const json = await response.json();
+
+      if (response.ok) {
+        setMessages((prev) => {
+          const newMessages = json.map((message) => ({
+            _id: message._id,
+            chatOption: message.subscription_id,
+            buyer: buyerInOption,
+            seller: sellerInOption,
+            sender: message.sender,
+            senderType: message.senderType,
+            receiver: message.receiver,
+            receiverType: message.receiverType,
+            text: message.text,
+            date_now_exclusion: message.date_now_exclusion,
+            seen: message.seen,
+          }));
+          return [...prev, ...newMessages];
+        });
+        console.log(json, "jsonnnn");
+        // setLoading(false);
+        // setProcessingNewMessages(true);
+      }
 
       // Ws sending message to server
       // try {

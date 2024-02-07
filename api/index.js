@@ -5,6 +5,11 @@ const dotenv = require("dotenv");
 dotenv.config();
 const cors = require("cors");
 const ws = require("ws");
+const io = require("socket.io")(3000, {
+  cors: {
+    origin: ["http://localhost:5173"]
+  },
+});
 
 const jwt = require("jsonwebtoken");
 const jwtSecret = process.env.JWT_SECRET;
@@ -53,6 +58,29 @@ mongoose
     const server = app.listen(4040, () => {
       console.log("connected to db and listening on port", 4040);
     });
+
+
+
+    io.on("connection", socket => {
+
+      socket.on('join-room', (chatOption) => {
+        // Validate chatOption
+        if (chatOption) {
+          socket.join(chatOption);
+          socket.emit('join-room-confirmation', { success: true });
+        } else {
+          socket.emit('join-room-confirmation', { success: false, error: 'Invalid chatOption' });
+        }
+      });
+
+      console.log(socket.id, "ids");
+      socket.on("send-message", (message, chatOption) => {
+        socket.join(chatOption);
+        // io.emit("handle-message", message)
+        socket.to(chatOption).emit("handle-message", message)
+        console.log(chatOption);
+      })
+    })
 
     // const wss = new ws.WebSocketServer({ server });
     // wss.on("connection", (connection, req) => {

@@ -15,7 +15,9 @@ export default function ChatOptions() {
     processingNewMessages,
     setProcessingNewMessages,
     chatOptions,
-    setChatOptions
+    setChatOptions,
+    test,
+    setTest
 
   } = useContext(ChatboxContext);
 
