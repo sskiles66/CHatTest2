@@ -35,18 +35,18 @@ export default function MessageLog() {
   // This hook calls everytime messages changes and when chatOption exists.
 
   useEffect(() => {
+    
     const fetchMessages = async () => {
       console.log(id);
       const response = await fetch(
-        // Had to add id so there is extra filtering happening when fetching messages
-        // for when we have multiple people subscribed to the same item
         `http://localhost:4040/chat/message/${chatOption}/all/${id}`
       );
-      
-      console.log(response, "resposne");
+  
+      console.log(response, "response");
       const json = await response.json();
-
+  
       if (response.ok) {
+        setMessages([])
         setMessages((prev) => {
           const newMessages = json.map((message) => ({
             _id: message._id,
@@ -64,15 +64,19 @@ export default function MessageLog() {
           return [...prev, ...newMessages];
         });
         console.log(json, "jsonnnn");
+        setRerender("render");
         setLoading(false);
         setProcessingNewMessages(true);
       }
     };
 
+    const intervalId = setInterval(fetchMessages, 30000); // Fetch every 30 seconds
+  
     if (chatOption && id) {
-      fetchMessages();
-      console.log(messages);
+      fetchMessages(); // Initial fetch
     }
+  
+    return () => clearInterval(intervalId); // Cleanup function to clear the interval
   }, [chatOption]);
 //xs
 
