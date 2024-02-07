@@ -83,6 +83,7 @@ mongoose
         const messageData = JSON.parse(message.toString());
 
         const {
+          event,
           chatOption,
           buyer,
           seller,
@@ -94,78 +95,126 @@ mongoose
           date_now_exclusion,
           seen
         } = messageData;
-        console.log(messageData);
 
-        if (chatOption && text) {
-          console.log("starting");
-          // All messages sent get stored in the user's messages context. This line sends the message back to the sender and receiver.
-          //This is not for specific chat rooms. The messageLog does filtering for that.
+        console.log(event);
+
+        if (event == "send"){
+          console.log("sending")
+          if (chatOption && text) {
+            console.log("starting");
+            // All messages sent get stored in the user's messages context. This line sends the message back to the sender and receiver.
+            //This is not for specific chat rooms. The messageLog does filtering for that.
+            const availableAndSpecifiedClients = [...wss.clients].filter(
+              (client) => client.userId == buyer || client.userId == seller
+            );
+  
+            let receiverFound = false;
+            for (const client of availableAndSpecifiedClients) {
+              if (client.userId === receiver) {
+                receiverFound = true;
+                break;
+              }
+            }
+  
+            // Need to do testing here.
+            // It is expectedly true or false when someone is not connected but just because they are connected 
+            // doesn't mean that they have seen the message since they are different chat logs (options)
+            console.log(receiverFound);
+            // if (receiverFound) {
+            //   // Receiver is available
+            //   availableAndSpecifiedClients.forEach((client) =>
+            //   client.send(
+            //     JSON.stringify({
+            //       chatOption,
+            //       buyer,
+            //       seller,
+            //       sender,
+            //       senderType,
+            //       receiver,
+            //       receiverType,
+            //       text,
+            //       date_now_exclusion,
+            //       seen: true
+  
+            //     })
+            //   )
+            // );
+              
+            // } else {
+              // Receiver is not available
+              availableAndSpecifiedClients.forEach((client) =>
+              client.send(
+                JSON.stringify({
+                  event,
+                  chatOption,
+                  buyer,
+                  seller,
+                  sender,
+                  senderType,
+                  receiver,
+                  receiverType,
+                  text,
+                  date_now_exclusion,
+                  seen,
+  
+                })
+              )
+            );
+            // }
+  
+            // Testing purposes
+            [...wss.clients]
+              .filter(
+                (client) => client.userId == buyer || client.userId == seller
+              )
+              .forEach((client) => console.log(client.userId));
+          }
+        }
+        if (event == "edit") {
+          console.log("editing");
           const availableAndSpecifiedClients = [...wss.clients].filter(
             (client) => client.userId == buyer || client.userId == seller
           );
 
-          let receiverFound = false;
-          for (const client of availableAndSpecifiedClients) {
-            if (client.userId === receiver) {
-              receiverFound = true;
-              break;
-            }
-          }
+          availableAndSpecifiedClients.forEach((client) =>
+              client.send(
+                JSON.stringify({
+                  event,
+                  chatOption,
+                  buyer,
+                  seller,
+                  sender,
+                  senderType,
+                  receiver,
+                  receiverType,
+                  text,
+                  date_now_exclusion,
+                  seen,
+  
+                })
+              )
+            );
 
-          // Need to do testing here.
-          // It is expectedly true or false when someone is not connected but just because they are connected 
-          // doesn't mean that they have seen the message since they are different chat logs (options)
-          console.log(receiverFound);
-          // if (receiverFound) {
-          //   // Receiver is available
-          //   availableAndSpecifiedClients.forEach((client) =>
-          //   client.send(
-          //     JSON.stringify({
-          //       chatOption,
-          //       buyer,
-          //       seller,
-          //       sender,
-          //       senderType,
-          //       receiver,
-          //       receiverType,
-          //       text,
-          //       date_now_exclusion,
-          //       seen: true
 
-          //     })
-          //   )
-          // );
-            
-          // } else {
-            // Receiver is not available
-            availableAndSpecifiedClients.forEach((client) =>
-            client.send(
-              JSON.stringify({
-                chatOption,
-                buyer,
-                seller,
-                sender,
-                senderType,
-                receiver,
-                receiverType,
-                text,
-                date_now_exclusion,
-                seen,
-
-              })
-            )
-          );
-          // }
-
-          // Testing purposes
-          [...wss.clients]
-            .filter(
-              (client) => client.userId == buyer || client.userId == seller
-            )
-            .forEach((client) => console.log(client.userId));
         }
+        console.log(messageData);
+
+        
       });
+
+      // connection.on("handleTest", (message) => {
+      //   console.log("deleing")
+      // });
     });
+
+
+
+
+
+
+
+
+    
     console.log("disconnected");
   })
   .catch((error) => {

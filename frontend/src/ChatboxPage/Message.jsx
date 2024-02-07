@@ -3,7 +3,7 @@ import { UserContext } from "../UserContext";
 import { ChatboxContext } from "./ChatboxContext";
 
 export default function Message(props) {
-  const { id } = useContext(UserContext);
+  const { id, ws } = useContext(UserContext);
 
   const { chatOption, buyerInOption, sellerInOption, setMessages } =
     useContext(ChatboxContext);
@@ -98,7 +98,28 @@ export default function Message(props) {
         console.log(error);
       });
 
-    setIsDeleted(true);
+    // setIsDeleted(true);
+
+    try {
+      ws.send(
+        JSON.stringify({
+          event: "edit",
+          chatOption: chatOption,
+            buyer: buyerInOption,
+            seller: sellerInOption,
+            // sender: realSender,
+            // senderType: realSenderType,
+            // receiver: realReceiver,
+            // receiverType: realReceiverType,
+            text: messageText,
+            date_now_exclusion: Date.now(),
+            seen: false,
+        })
+      );
+    } catch (error) {
+      // errorMessages.push(error);
+      console.error("Error:", error);
+    }
   }
 
   return (

@@ -5,11 +5,11 @@ import { v4 as uuidv4 } from "uuid";
 import debounce from "lodash/debounce";
 
 export default function MessageSender() {
-  const { username, id, setNotifications } = useContext(UserContext);
+  const { username, id, setNotifications, ws } = useContext(UserContext);
 
   const [messageText, setMessageText] = useState("");
 
-  const [ws, setWs] = useState(null);
+  
 
   const [broadcast, setBroadcast] = useState(false);
 
@@ -49,53 +49,13 @@ export default function MessageSender() {
 
   // On mount, the ws is set-up and it listens for messages from the server.
 
-  useEffect(() => {
-    const ws = new WebSocket("ws://localhost:4040");
-    setWs(ws);
-    ws.addEventListener("message", handleMessage);
-  }, []);
+
 
 
   // This is the function that is called when a message is sent from the server to the client.
   // It sets messages to build upon the previous messages that have already been fetched from the db.
   // Have ran into issues with rerendering notification here.
-  function handleMessage(e) {
-    const messageData = JSON.parse(e.data);
-    console.log(messageData, "messageData");
-
-    setMessages((prev) => [
-      ...prev,
-      {
-        chatOption: messageData.chatOption,
-        buyer: messageData.buyer,
-        seller: messageData.seller,
-        sender: messageData.sender,
-        senderType: messageData.senderType,
-        receiver: messageData.receiver,
-        receiverType: messageData.receiverType,
-        text: messageData.text,
-        date_now_exclusion: messageData.date_now_exclusion,
-        seen: messageData.seen,
-      },
-    ]);
-
-    //This wasn't running since the effect hook that refetches data in Navbar isn't being rerun.
-    
-
-    // if (messages){
-    //   console.log(messages, "messages!!!");
-    //   setNotifications((prev) => 
-    //   prev,
-    //   messages.filter(
-    //     (message) => message.receiver == id && message.seen == false
-    //   )
-    // );
-    // }
-
-    // setNotifications(messageData);
-    
-  }
-
+  
 
   // This function currently references a broadcast state so that if it is true,
   // it sends the messages to all of the user's chatOptions
@@ -140,6 +100,7 @@ export default function MessageSender() {
         try {
           ws.send(
             JSON.stringify({
+              event: "send",
               chatOption: element._id,
               buyer: element.buyer_id,
               seller: element.seller_id,
@@ -192,6 +153,7 @@ export default function MessageSender() {
       try {
         ws.send(
           JSON.stringify({
+            event: "send",
             chatOption: chatOption,
             buyer: buyerInOption,
             seller: sellerInOption,
