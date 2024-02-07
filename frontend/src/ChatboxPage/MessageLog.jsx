@@ -70,13 +70,13 @@ export default function MessageLog() {
       }
     };
 
-    const intervalId = setInterval(fetchMessages, 30000); // Fetch every 30 seconds
+    // const intervalId = setInterval(fetchMessages, 30000); // Fetch every 30 seconds
   
     if (chatOption && id) {
       fetchMessages(); // Initial fetch
     }
   
-    return () => clearInterval(intervalId); // Cleanup function to clear the interval
+    // return () => clearInterval(intervalId); // Cleanup function to clear the interval
   }, [chatOption]);
 //xs
 
