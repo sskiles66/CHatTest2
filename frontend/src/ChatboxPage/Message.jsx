@@ -1,6 +1,8 @@
 import { useEffect, useState, useContext } from "react";
 import { UserContext } from "../UserContext";
 import { ChatboxContext } from "./ChatboxContext";
+import { io } from "socket.io-client";
+import { connectSocket, socket2 } from "./socket";
 
 export default function Message(props) {
   const { id } = useContext(UserContext);
@@ -14,7 +16,29 @@ export default function Message(props) {
 
   const [isDeleted, setIsDeleted] = useState(false);
 
-//   console.log(props, "message props");
+  if (props.isLast) {
+    connectSocket()
+      .then((socket) => {
+
+        socket.on("handle-delete-message", (_id) => {
+          setMessages((prev) => prev.filter((message) => message._id !== _id));
+        });
+
+        socket.on("handle-edit-message", (_id, messageText) => {
+          setMessages((prev) =>
+            prev.map((message) =>
+              _id === message._id ? { ...message, text: messageText } : message
+            )
+          );
+        });
+
+      })
+      .catch((error) => {
+        // Handle error
+      });
+  }
+
+  //   console.log(props, "message props");
 
   let role;
 
@@ -61,7 +85,7 @@ export default function Message(props) {
 
     // console.log(formattedDate); // Output: 2/1 16:47:43
 
-    return formattedDate
+    return formattedDate;
   }
 
   date = getDate(props.messageData.date_now_exclusion);
@@ -79,6 +103,7 @@ export default function Message(props) {
       }),
     });
     setEditToggle(false);
+    socket2.emit("edit-message", props.messageData._id, messageText, chatOption);
   }
 
   function deleteMessage(e) {
@@ -98,7 +123,9 @@ export default function Message(props) {
         console.log(error);
       });
 
-    setIsDeleted(true);
+    // setIsDeleted(true);
+
+    socket2.emit("delete-message", props.messageData._id, chatOption);
   }
 
   return (

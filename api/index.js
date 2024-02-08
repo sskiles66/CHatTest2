@@ -6,6 +6,7 @@ dotenv.config();
 const cors = require("cors");
 const ws = require("ws");
 const io = require("socket.io")(3000, {
+  // pingTimeout: 60000,     for closing connection after enough inactive time
   cors: {
     origin: ["http://localhost:5173"]
   },
@@ -79,6 +80,17 @@ mongoose
         // io.emit("handle-message", message)
         socket.to(chatOption).emit("handle-message", message)
         console.log(chatOption);
+      })
+
+      socket.on("delete-message", (_id, chatOption) => {
+        console.log(_id);
+        socket.join(chatOption);
+        socket.to(chatOption).emit("handle-delete-message", _id)
+      })
+
+      socket.on("edit-message", (_id, messageText, chatOption) => {
+        socket.join(chatOption);
+        socket.to(chatOption).emit("handle-edit-message", _id, messageText)
       })
     })
 

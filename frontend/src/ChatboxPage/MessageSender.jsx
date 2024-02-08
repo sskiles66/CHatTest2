@@ -4,6 +4,7 @@ import { ChatboxContext } from "./ChatboxContext";
 import { v4 as uuidv4 } from "uuid";
 import debounce from "lodash/debounce";
 import { io } from "socket.io-client";
+import { connectSocket, socket2 } from "./socket";
 
 export default function MessageSender() {
   const { username, id, setNotifications } = useContext(UserContext);
@@ -22,49 +23,90 @@ export default function MessageSender() {
 
   const [ws, setWs] = useState(null);
 
-  const [broadcast, setBroadcast] = useState(false);
-  const socket = io("http://localhost:3000");
-  socket.on("connect", () => {
-    console.log("connected");
-  });
+  // const [broadcast, setBroadcast] = useState(false);
+  // const socket = io("http://localhost:3000");
 
-  //The join method is not directly available 
-  // on the socket object in socket.io-client. 
+  // socket.on("connect", () => {
+  //   console.log("connected 1");
+  // });
+
+  //The join method is not directly available
+  // on the socket object in socket.io-client.
   // Instead, you need to emit a custom event to the server requesting to join a room.
 
-  // Emit an event requesting to join the room
-  socket.emit("join-room", chatOption);
+  connectSocket()
+    .then((socket) => {
+      // Emit an event requesting to join the room
+      socket.emit("join-room", chatOption);
 
-  // Listen for confirmation from the server
-  socket.on("join-room-confirmation", (data) => {
-    if (data.success) {
-      // Successfully joined the room
-      console.log("Joined room:", chatOption);
-    } else {
-      // handle error message (e.g., invalid chatOption)
-    }
-  });
+      // Listen for confirmation from the server
+      socket.on("join-room-confirmation", (data) => {
+        if (data.success) {
+          // Successfully joined the room
+          console.log("Joined room:", chatOption);
+        } else {
+          // handle error message (e.g., invalid chatOption)
+        }
+      });
 
-  socket.on("handle-message", (message) => {
-    console.log(message, "INCOMING");
-    const newMessage = JSON.parse(message);
+      socket.on("handle-message", (message) => {
+        console.log(message, "INCOMING");
+        const newMessage = JSON.parse(message);
 
-    setMessages((prev) => [
-      ...prev,
-      {
-        chatOption: newMessage.subscription_id,
-        buyer: newMessage.buyer,
-        seller: newMessage.seller,
-        sender: newMessage.sender,
-        senderType: newMessage.senderType,
-        receiver: newMessage.receiver,
-        receiverType: newMessage.receiverType,
-        text: newMessage.text,
-        date_now_exclusion: newMessage.date_now_exclusion,
-        seen: newMessage.seen,
-      },
-    ]);
-  });
+        setMessages((prev) => [
+          ...prev,
+          {
+            chatOption: newMessage.subscription_id,
+            buyer: newMessage.buyer,
+            seller: newMessage.seller,
+            sender: newMessage.sender,
+            senderType: newMessage.senderType,
+            receiver: newMessage.receiver,
+            receiverType: newMessage.receiverType,
+            text: newMessage.text,
+            date_now_exclusion: newMessage.date_now_exclusion,
+            seen: newMessage.seen,
+          },
+        ]);
+      });
+    })
+    .catch((error) => {
+      // Handle error
+    });
+
+  // // Emit an event requesting to join the room
+  // socket.emit("join-room", chatOption);
+
+  // // Listen for confirmation from the server
+  // socket.on("join-room-confirmation", (data) => {
+  //   if (data.success) {
+  //     // Successfully joined the room
+  //     console.log("Joined room:", chatOption);
+  //   } else {
+  //     // handle error message (e.g., invalid chatOption)
+  //   }
+  // });
+
+  // socket.on("handle-message", (message) => {
+  //   console.log(message, "INCOMING");
+  //   const newMessage = JSON.parse(message);
+
+  //   setMessages((prev) => [
+  //     ...prev,
+  //     {
+  //       chatOption: newMessage.subscription_id,
+  //       buyer: newMessage.buyer,
+  //       seller: newMessage.seller,
+  //       sender: newMessage.sender,
+  //       senderType: newMessage.senderType,
+  //       receiver: newMessage.receiver,
+  //       receiverType: newMessage.receiverType,
+  //       text: newMessage.text,
+  //       date_now_exclusion: newMessage.date_now_exclusion,
+  //       seen: newMessage.seen,
+  //     },
+  //   ]);
+  // });
 
   let errorMessages = [];
 
@@ -168,7 +210,7 @@ export default function MessageSender() {
         throw new Error("Error posting message");
       }
 
-      socket.emit(
+      socket2.emit(
         "send-message",
         JSON.stringify({
           // ... message data
