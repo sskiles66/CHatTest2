@@ -3,7 +3,7 @@ import { UserContext } from "../UserContext";
 import Option from "./Option";
 import { ChatboxContext } from "./ChatboxContext";
 import { uniqBy } from "lodash";
-import { connectSocket, socket2 } from "./socket";
+// import { connectSocket, socket2 } from "./socket";
 
 export default function ChatOptions() {
   const { id, notifications} = useContext(UserContext);

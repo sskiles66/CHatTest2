@@ -12,6 +12,13 @@ const io = require("socket.io")(3000, {
   },
 });
 
+const io2 = require("socket.io")(3001, {
+  // pingTimeout: 60000,     for closing connection after enough inactive time
+  cors: {
+    origin: ["http://localhost:5173"],
+  },
+});
+
 const jwt = require("jsonwebtoken");
 const jwtSecret = process.env.JWT_SECRET;
 
@@ -77,7 +84,6 @@ mongoose
         }
       });
 
-  
       console.log(socket.id, "ids");
       socket.on("send-message", (message, chatOption) => {
         socket.join(chatOption);
@@ -85,9 +91,12 @@ mongoose
         socket.to(chatOption).emit("handle-message", message);
         console.log(chatOption);
       });
+    });
 
+    io2.on("connection", (socket) => {
       socket.on("delete-message", (_id, chatOption) => {
-        console.log(_id);
+        console.log(_id, "DELETETETETE");
+        console.log(chatOption, "Chat OPtion mf")
         socket.join(chatOption);
         socket.to(chatOption).emit("handle-delete-message", _id);
       });

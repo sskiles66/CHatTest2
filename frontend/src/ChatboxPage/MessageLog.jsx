@@ -2,7 +2,7 @@ import { useEffect, useState, useContext, useRef } from "react";
 import { UserContext } from "../UserContext";
 import { ChatboxContext } from "./ChatboxContext";
 import Message from "./Message";
-import { connectSocket, socket2 } from "./socket";
+// import { connectSocket, socket2 } from "./socket";
 
 import { uniqBy } from "lodash";
 
@@ -34,18 +34,18 @@ export default function MessageLog() {
   // Effect hook can be called so that these messages can be patched to be seen
   // This hook calls everytime messages changes and when chatOption exists.
 
-  connectSocket()
-    .then((socket) => {
+  // connectSocket()
+  //   .then((socket) => {
       
 
-      socket.on("handle-notif", (_id) => {
-        // setMessages((prev) => prev.filter((message) => message._id !== _id));
-        console.log("HANDLENOTIF")
-      });
-    })
-    .catch((error) => {
-      // Handle error
-    });
+  //     socket.on("handle-notif", (_id) => {
+  //       // setMessages((prev) => prev.filter((message) => message._id !== _id));
+  //       console.log("HANDLENOTIF")
+  //     });
+  //   })
+  //   .catch((error) => {
+  //     // Handle error
+  //   });
 
   useEffect(() => {
     const fetchMessages = async () => {
