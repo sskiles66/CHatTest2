@@ -2,11 +2,11 @@ import { useEffect, useState, useContext, useRef } from "react";
 import { UserContext } from "../UserContext";
 import { ChatboxContext } from "./ChatboxContext";
 import Message from "./Message";
+import { connectSocket, socket2 } from "./socket";
 
 import { uniqBy } from "lodash";
 
 export default function MessageLog() {
-
   //Context change triggers re-render!
   const {
     chatOption,
@@ -18,7 +18,7 @@ export default function MessageLog() {
     setProcessingNewMessages,
   } = useContext(ChatboxContext);
 
-  const { id, setNotifications, setRerender} = useContext(UserContext);
+  const { id, notifications, setNotifications, setRerender } = useContext(UserContext);
 
   // To make sure that the rendering of this component waits until the messages are ready.
   const [loading, setLoading] = useState(true);
@@ -34,19 +34,31 @@ export default function MessageLog() {
   // Effect hook can be called so that these messages can be patched to be seen
   // This hook calls everytime messages changes and when chatOption exists.
 
+  connectSocket()
+    .then((socket) => {
+      
+
+      socket.on("handle-notif", (_id) => {
+        // setMessages((prev) => prev.filter((message) => message._id !== _id));
+        console.log("HANDLENOTIF")
+      });
+    })
+    .catch((error) => {
+      // Handle error
+    });
+
   useEffect(() => {
-    
     const fetchMessages = async () => {
       console.log(id);
       const response = await fetch(
         `http://localhost:4040/chat/message/${chatOption}/all/${id}`
       );
-  
+
       console.log(response, "response");
       const json = await response.json();
-  
+
       if (response.ok) {
-        setMessages([])
+        setMessages([]);
         setMessages((prev) => {
           const newMessages = json.map((message) => ({
             _id: message._id,
@@ -59,7 +71,7 @@ export default function MessageLog() {
             receiverType: message.receiverType,
             text: message.text,
             date_now_exclusion: message.date_now_exclusion,
-            seen: message.seen
+            seen: message.seen,
           }));
           return [...prev, ...newMessages];
         });
@@ -71,14 +83,14 @@ export default function MessageLog() {
     };
 
     // const intervalId = setInterval(fetchMessages, 30000); // Fetch every 30 seconds
-  
+
     if (chatOption && id) {
       fetchMessages(); // Initial fetch
     }
-  
+
     // return () => clearInterval(intervalId); // Cleanup function to clear the interval
   }, [chatOption]);
-//xs
+  //xs
 
   // This hook makes it so that messages are autoscrolled everytime messages change.
   useEffect(() => {
@@ -88,13 +100,11 @@ export default function MessageLog() {
     }
   }, [messages]);
 
-
   // When processingNewMessages are true, every message for the receiver and that has an _id,
-  // I patch every message to be seen (this is definently not efficient) and rerender is changed 
+  // I patch every message to be seen (this is definently not efficient) and rerender is changed
   // so that notifications are refetched in the navbar. This happens whenever processingNewMessages changes.
   useEffect(() => {
-
-    if (processingNewMessages){
+    if (processingNewMessages) {
       console.log(messages, "inside of effect hook");
       const promises = messages.map((message) => {
         if (id == message.receiver) {
@@ -111,18 +121,18 @@ export default function MessageLog() {
           }
         }
       });
-      //make new fetch to notifications. Possible solution. Update messages to seen and then refetch notifications.
-      setRerender("render");
-      // setNotifications(
-      //     messages.filter(
-      //       (message) => message.sender == id && message.seen == false && message.chatOption == chatOption
-      //     )
-      //   );
-      // console.log(promises);
-    }
-   
 
-    
+      console.log(notifications, "NOTIFSF");
+
+      //make new fetch to notifications. Possible solution. Update messages to seen and then refetch notifications.
+      // setRerender("render");
+      // con
+      // setNotifications([]);
+
+      const messageIds = messages.map(message => message._id);
+
+      setNotifications(notifications.filter(notification => !messageIds.includes(notification._id)));
+    }
   }, [processingNewMessages]);
 
   // console.log(processingNewMessages, "what processingNewMessages is");
@@ -137,7 +147,7 @@ export default function MessageLog() {
   //       // for when we have multiple people subscribed to the same item
   //       `http://localhost:4040/chat/message/${chatOption}/all/${id}`
   //     );
-      
+
   //     console.log(response, "resposne");
   //     const json = await response.json();
 
@@ -175,8 +185,8 @@ export default function MessageLog() {
   // Currently necessary for messages coming through the websocket because thats where duplication
   // is taking place. Gave each document an exlusion date so that this next code wouldn't break the fetch.
 
-  //WHen messages are sent through the websocket, they are duplicates so this lodash method 
-  // gets rid of the duplicates based upon the date that they were created. 
+  //WHen messages are sent through the websocket, they are duplicates so this lodash method
+  // gets rid of the duplicates based upon the date that they were created.
   const uniqueMessages = uniqBy(messages, "date_now_exclusion");
 
   console.log(uniqueMessages, " unique messages");
@@ -190,7 +200,13 @@ export default function MessageLog() {
 
   return (
     <>
-    {!allMessagesFetched ? <button onClick={() => setAllMessagesFetched(true)}>Fetch all messages</button> : ""}
+      {!allMessagesFetched ? (
+        <button onClick={() => setAllMessagesFetched(true)}>
+          Fetch all messages
+        </button>
+      ) : (
+        ""
+      )}
       <h1>Message Log</h1>
       {chatOption ? (
         <>
@@ -199,7 +215,11 @@ export default function MessageLog() {
           ) : (
             <>
               {filteredMessages.map((message, index) => (
-                <Message key={index} messageData={message} isLast={index === filteredMessages.length - 1}/>
+                <Message
+                  key={index}
+                  messageData={message}
+                  isLast={index === filteredMessages.length - 1}
+                />
               ))}
               <div ref={divUnderMessages}></div>
             </>

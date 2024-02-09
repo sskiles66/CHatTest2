@@ -32,6 +32,12 @@ export function ChatboxContextProvider({ children }) {
 
   const [processingNewMessages, setProcessingNewMessages] = useState(false);
 
+  const [socket, setSocket] = useState(null);
+
+  // useEffect(() => {
+  //   connectSocket().then((connectedSocket) => setSocket(connectedSocket));
+  // }, []);
+
   
   return (
     <ChatboxContext.Provider
@@ -47,7 +53,8 @@ export function ChatboxContextProvider({ children }) {
         processingNewMessages,
         setProcessingNewMessages,
         chatOptions,
-        setChatOptions
+        setChatOptions,
+        socket
       }}
     >
       {children}

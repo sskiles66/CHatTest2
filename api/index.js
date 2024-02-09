@@ -8,7 +8,7 @@ const ws = require("ws");
 const io = require("socket.io")(3000, {
   // pingTimeout: 60000,     for closing connection after enough inactive time
   cors: {
-    origin: ["http://localhost:5173"]
+    origin: ["http://localhost:5173"],
   },
 });
 
@@ -60,39 +60,43 @@ mongoose
       console.log("connected to db and listening on port", 4040);
     });
 
-
-
-    io.on("connection", socket => {
-
-      socket.on('join-room', (chatOption) => {
+    io.on("connection", (socket) => {
+      socket.on("join-room", (chatOption) => {
         // Validate chatOption
+        console.log(chatOption, "hgdjnsns");
         if (chatOption) {
           socket.join(chatOption);
-          socket.emit('join-room-confirmation', { success: true });
+          console.log("Hsould be oing someohng");
+          socket.emit("join-room-confirmation", { success: true }, chatOption);
         } else {
-          socket.emit('join-room-confirmation', { success: false, error: 'Invalid chatOption' });
+          socket.emit(
+            "join-room-confirmation",
+            { success: false, error: "Invalid chatOption" },
+            chatOption
+          );
         }
       });
 
+  
       console.log(socket.id, "ids");
       socket.on("send-message", (message, chatOption) => {
         socket.join(chatOption);
         // io.emit("handle-message", message)
-        socket.to(chatOption).emit("handle-message", message)
+        socket.to(chatOption).emit("handle-message", message);
         console.log(chatOption);
-      })
+      });
 
       socket.on("delete-message", (_id, chatOption) => {
         console.log(_id);
         socket.join(chatOption);
-        socket.to(chatOption).emit("handle-delete-message", _id)
-      })
+        socket.to(chatOption).emit("handle-delete-message", _id);
+      });
 
       socket.on("edit-message", (_id, messageText, chatOption) => {
         socket.join(chatOption);
-        socket.to(chatOption).emit("handle-edit-message", _id, messageText)
-      })
-    })
+        socket.to(chatOption).emit("handle-edit-message", _id, messageText);
+      });
+    });
 
     // const wss = new ws.WebSocketServer({ server });
     // wss.on("connection", (connection, req) => {
@@ -153,7 +157,7 @@ mongoose
     //       }
 
     //       // Need to do testing here.
-    //       // It is expectedly true or false when someone is not connected but just because they are connected 
+    //       // It is expectedly true or false when someone is not connected but just because they are connected
     //       // doesn't mean that they have seen the message since they are different chat logs (options)
     //       console.log(receiverFound);
     //       // if (receiverFound) {
@@ -175,7 +179,7 @@ mongoose
     //       //     })
     //       //   )
     //       // );
-            
+
     //       // } else {
     //         // Receiver is not available
     //         availableAndSpecifiedClients.forEach((client) =>
