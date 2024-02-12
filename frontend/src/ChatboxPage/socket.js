@@ -1,22 +1,22 @@
-// import { io } from 'socket.io-client';
+import { io } from 'socket.io-client';
 
-// // socket.js
+// socket.js
 
-// let socket;
+let socket;
 
-// export const connectSocket = () => {
-//   return new Promise((resolve, reject) => {
-//     socket = io('http://localhost:3000');
-//     socket.on('connect', () => {
-//       // Socket is connected
-//       resolve(socket);
-//     });
-//     socket.on('error', (error) => {
-//       // Handle error
-//       reject(error);
-//     });
-//   });
-// };
+export const connectSocket = () => {
+  return new Promise((resolve, reject) => {
+    socket = io('http://localhost:3000');
+    socket.on('connect', () => {
+      // Socket is connected
+      resolve(socket);
+    });
+    socket.on('error', (error) => {
+      // Handle error
+      reject(error);
+    });
+  });
+};
 
-// export const socket2 = io('http://localhost:3000');
+export const socket2 = io('http://localhost:3000');
 

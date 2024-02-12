@@ -2,7 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import { UserContext } from "../UserContext";
 import { ChatboxContext } from "./ChatboxContext";
 import { io } from "socket.io-client";
-// import { connectSocket, socket2 } from "./socket";
+import { connectSocket, socket2 } from "./socket";
 
 export default function Message(props) {
   const { id } = useContext(UserContext);
@@ -16,25 +16,26 @@ export default function Message(props) {
 
   const [isDeleted, setIsDeleted] = useState(false);
 
-  
-
   if (props.isLast) {
-    const socket = io("http://localhost:3001");
-    socket.on("connect", () => {
-      console.log("COnntecetd?!?!?!")
-      socket.on("handle-delete-message", (_id) => {
-        console.log("FUCK")
-        setMessages((prev) => prev.filter((message) => message._id !== _id));
-      });
+    connectSocket()
+      .then((socket) => {
 
-      socket.on("handle-edit-message", (_id, messageText) => {
-        setMessages((prev) =>
-          prev.map((message) =>
-            _id === message._id ? { ...message, text: messageText } : message
-          )
-        );
+        socket.on("handle-delete-message", (_id) => {
+          setMessages((prev) => prev.filter((message) => message._id !== _id));
+        });
+
+        socket.on("handle-edit-message", (_id, messageText) => {
+          setMessages((prev) =>
+            prev.map((message) =>
+              _id === message._id ? { ...message, text: messageText } : message
+            )
+          );
+        });
+
+      })
+      .catch((error) => {
+        // Handle error
       });
-    });
   }
 
   //   console.log(props, "message props");
@@ -102,12 +103,7 @@ export default function Message(props) {
       }),
     });
     setEditToggle(false);
-    socket.emit(
-      "edit-message",
-      props.messageData._id,
-      messageText,
-      chatOption
-    );
+    socket2.emit("edit-message", props.messageData._id, messageText, chatOption);
   }
 
   function deleteMessage(e) {
@@ -128,8 +124,8 @@ export default function Message(props) {
       });
 
     // setIsDeleted(true);
-    const socket = io("http://localhost:3001");
-    socket.emit("delete-message", props.messageData._id, chatOption);
+
+    socket2.emit("delete-message", props.messageData._id, chatOption);
   }
 
   return (
