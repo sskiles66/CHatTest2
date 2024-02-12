@@ -1,7 +1,6 @@
 import { useEffect, useState, useContext } from "react"
 import { UserContext } from "./UserContext";
 import { ChatboxContext } from "./ChatboxPage/ChatboxContext";
-import { uniqBy } from "lodash";
 
 export default function Navbar(){
 
@@ -29,25 +28,23 @@ export default function Navbar(){
 
         if (id){
             fetchUnseenMessages();
-            // setRerender("");
+            setRerender("");
         }
         
         // had notifications in dependency array but I believe this was making everything re-render maybe?
-    }, [id]);
+    }, [id, rerender]);
 
 
     // useEffect(() => {
     //     setNotifications(notifications);
     // }, [notifications])
 
-    const uniqueNotifs = uniqBy(notifications, "date_now_exclusion");
-
 
     // console.log(notifications, "notititit")
     return (
         <>
             <p>Navbar</p>
-            {notifications ? (<p>{uniqueNotifs.length}</p>) : 0}
+            {notifications ? (<p>{notifications.length}</p>) : 0}
             <button onClick={() => setRerender("render")}>Refresh</button>
             
         </>

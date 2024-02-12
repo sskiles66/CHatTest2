@@ -2,14 +2,11 @@ import { useEffect, useContext, useState } from "react";
 import { UserContext } from "../UserContext";
 import Option from "./Option";
 import { ChatboxContext } from "./ChatboxContext";
-import { uniqBy } from "lodash";
-import { connectSocket, socket2 } from "./socket";
 
 export default function ChatOptions() {
   const { id, notifications} = useContext(UserContext);
 
   const {
-    chatOption,
     setChatOption,
     setBuyerInOption,
     setSellerInOption,
@@ -25,7 +22,6 @@ export default function ChatOptions() {
   } = useContext(ChatboxContext);
 
   // OnMount, chatOptions are fetched and then set.
-
 
   useEffect(() => {
     const fetchOptions = async () => {
@@ -52,9 +48,6 @@ export default function ChatOptions() {
   // Notifications are set in the navbar component and are filtered based upon the sub_id.
   // When an option is clicked, some data is set in the chatbox context.
 
-
-  const uniqueNotifs = uniqBy(notifications, "date_now_exclusion");
-
   return (
     <>
       <h1>Chat Options</h1>
@@ -63,7 +56,7 @@ export default function ChatOptions() {
           <Option
             key={option._id}
             data={option}
-            notifications={uniqueNotifs.filter(notification => notification.subscription_id == option._id)}
+            notifications={notifications.filter(notification => notification.subscription_id == option._id)}
             onClick={() => {
               setChatOption(option._id);
               setBuyerInOption(option.buyer_id);

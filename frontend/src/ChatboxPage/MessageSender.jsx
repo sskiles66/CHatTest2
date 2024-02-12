@@ -37,10 +37,9 @@ export default function MessageSender() {
   connectSocket()
     .then((socket) => {
       // Emit an event requesting to join the room
-
       socket.emit("join-room", chatOption);
 
-      // // Listen for confirmation from the server
+      // Listen for confirmation from the server
       socket.on("join-room-confirmation", (data) => {
         if (data.success) {
           // Successfully joined the room
@@ -51,9 +50,8 @@ export default function MessageSender() {
       });
 
       socket.on("handle-message", (message) => {
-        
+        console.log(message, "INCOMING");
         const newMessage = JSON.parse(message);
-        console.log(newMessage, "INCOMING");
 
         setMessages((prev) => [
           ...prev,
@@ -70,14 +68,6 @@ export default function MessageSender() {
             seen: newMessage.seen,
           },
         ]);
-
-        if (id == newMessage.receiver){
-          setNotifications((prev) => [
-            ...prev,
-            newMessage
-          ]);
-        }
-
       });
     })
     .catch((error) => {
