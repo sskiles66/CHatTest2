@@ -80,7 +80,22 @@ mongoose
         socket.to(chatOption).emit("handle-message", message)
         console.log(chatOption);
       })
+
+      socket.on("delete", (chatOption) => {
+        socket.join(chatOption);
+        // io.emit("handle-message", message)
+        socket.to(chatOption).emit("handle-delete")
+        console.log(chatOption, "to delete");
+      })
+
+      socket.off("test", () => {
+        console.log("SOCKET DISCONNECTED");
+        socket.leave(chatOption)
+      })
     })
+
+
+    
 
     // const wss = new ws.WebSocketServer({ server });
     // wss.on("connection", (connection, req) => {

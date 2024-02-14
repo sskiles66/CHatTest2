@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext } from "react";
 import { UserContext } from "../UserContext";
 import { ChatboxContext } from "./ChatboxContext";
+import { io } from "socket.io-client";
 
 export default function Message(props) {
   const { id } = useContext(UserContext);
@@ -14,7 +15,19 @@ export default function Message(props) {
 
   const [isDeleted, setIsDeleted] = useState(false);
 
-//   console.log(props, "message props");
+  let socket;
+
+  //   console.log(props, "message props");
+
+  if (props.isLast) {
+    const socket = io("http://localhost:3000");
+    socket.on("connectAgain", () => {
+      console.log("connected again");
+    });
+    socket.on("handle-delete", () => {
+      console.log("YESSEESE DELETETE")
+    });
+  }
 
   let role;
 
@@ -61,7 +74,7 @@ export default function Message(props) {
 
     // console.log(formattedDate); // Output: 2/1 16:47:43
 
-    return formattedDate
+    return formattedDate;
   }
 
   date = getDate(props.messageData.date_now_exclusion);
@@ -98,7 +111,10 @@ export default function Message(props) {
         console.log(error);
       });
 
-    setIsDeleted(true);
+    // setIsDeleted(true);
+    const socket = io("http://localhost:3000");
+    socket.emit("delete", chatOption);
+    
   }
 
   return (
