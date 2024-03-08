@@ -337,7 +337,7 @@ export default function MessageSender() {
           }));
           return [...prev, ...newMessages];
         });
-        console.log(json, "jsonnnn");
+        console.log(json, "jsonnnn");gdgdgd
         // setLoading(false);
         // setProcessingNewMessages(true);
       }
