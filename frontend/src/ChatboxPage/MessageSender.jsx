@@ -337,7 +337,10 @@ export default function MessageSender() {
           }));
           return [...prev, ...newMessages];
         });
+        console.log(json, "jsonnnn");nkcjkd
+        ojckskpcs
         console.log(json, "jsonnnn");gdgdgd
+
         // setLoading(false);
         // setProcessingNewMessages(true);
       }
